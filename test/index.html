@@ -1,0 +1,40 @@
+<html>
+  <head>
+    <title>test</title>
+  </head>
+  <body>
+    <form action="login.php" method="post" name="loginForm">
+      <p>Username: <input type="text" name="username" /></p>
+      <p>Password: <input type="text" name="password" /></p>
+      <select name="cars" id="cars">
+        <option value="volvo">Volvo</option>
+        <option value="saab">Saab</option>
+        <option value="mercedes">Mercedes</option>
+        <option value="audi">Audi</option>
+      </select>
+      <input
+        type="file"
+        id="avatar"
+        name="avatar"
+        accept="image/png, image/jpeg"
+      />
+      <input type="submit" value="Submit" />
+    </form>
+    <!-- http://127.0.0.1/test3.html 302 403 -->
+    <p>Have you seen our <a href="/a/../test1.html">Bird Cages</a>?</p>
+    <div id="div1" onclick="console.log(1)">
+      Test Div1
+      <div class="a">
+        Div1 Child1
+        <div class="b">Div1 Child1 Child1</div>
+      </div>
+    </div>
+    <div id="div2">Test Div2</div>
+    <script>
+     div2.onclick = () => console.log(233);
+     div1.addEventListener('click', function setup(e) {
+        console.log('No');
+      });
+    </script>
+  </body>
+</html>
