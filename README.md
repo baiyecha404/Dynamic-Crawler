@@ -9,7 +9,7 @@
     - 开启interception 等配置
 - hookNavigation ✔️
     - front-end redirect (使用[他人修改chromium源码的版本](https://github.com/myvyang/chromium_for_spider), 此处尝试204响应发现并不能拿到全部跳转url)
-    - back-end redirect , 对于30x响应, 用`fetch`判断body是否为空, 从而修改相应。而location 的值通过response 入队。
+    - back-end redirect , 对于30x响应, 用`fetch`判断body是否为空, 从而修改响应。而location 的值通过response 入队。
     - 对于图片等资源返回自定义图片
 - 收集链接 ✔️
     - 收集 src, href 等链接, 且根据base标签是否存在来parse url
