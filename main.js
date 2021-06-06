@@ -1,7 +1,7 @@
 const config = require('./config.json');
 const randomUseragent = require('random-useragent');
 const { Cluster } = require("puppeteer-cluster");
-const { hookJS, urlParse } = require('./utils');
+const { hookJS, urlParse, inScope } = require('./utils');
 const { hookNavigation } = require('./helpers/navHelper');
 const { getLink, parseComment } = require('./helpers/linkHelper');
 const { handleForm, createFrame } = require('./helpers/formHelper');
@@ -26,8 +26,11 @@ const getNavRedirects = () => {
         result.splice(0, 1);
         return result;
     }
+    return [];
 }
 
+// urls worklist 
+let WORK_LIST = new Set();
 
 (async () => {
     const cluster = await Cluster.launch({
@@ -67,15 +70,7 @@ const getNavRedirects = () => {
             timeout: 30000,
         });
 
-        // preload js hook urls
-        let urls = await page.evaluate(() => {
-            return window.urls;
-        })
-    
 
-         // redirect urls that are hooked by browser along with backend 302
-        let navURLs = await page.evaluate(getNavRedirects)
-        console.log(navURLs);
         // get urls from src, href, etc.
         // get base url if base tag exists
         let baseURL;
@@ -92,7 +87,6 @@ const getNavRedirects = () => {
                 linkURLS.push(parsedURL);
             }
         }
-        //console.log(linkURLS);
 
         let commentURLS = [];
         const comments = await parseComment(await page.$x("//comment()"));
@@ -102,7 +96,6 @@ const getNavRedirects = () => {
                 commentURLS.push(parsedURL);
             }
         };
-        //console.log(commentURLS);
 
         //trigger DOM / Inline events    
         await triggerInlineEvent(page);
@@ -113,12 +106,28 @@ const getNavRedirects = () => {
         await page.evaluate(createFrame);
         await handleForm(formNodes);
 
-        const ENV_URLS = urls.concat(linkURLS).concat(commentURLS)
-        for (let url of ENV_URLS) {
-            cluster.execute(url);
+
+        // js hook urls
+        let urls = await page.evaluate(() => {
+            return window.urls;
+        })
+
+        // redirect urls that are hooked by browser along with backend 302
+        let navURLs = await page.evaluate(getNavRedirects)
+
+        const ENV_URLS = urls.concat(linkURLS).concat(commentURLS).concat(redirectURLs).concat(navURLs);
+        console.log(ENV_URLS);
+
+        for (let target of ENV_URLS) {
+            if (!WORK_LIST.has(target)) {
+                if (inScope(target, url)) {
+                    WORK_LIST.add(target);
+                    cluster.execute(target);
+                }
+            }
         }
     });
-    cluster.execute('http://baidu.com/');
+    cluster.execute('http://127.0.0.1/test2.html');
 
     await cluster.idle();
     await cluster.close();

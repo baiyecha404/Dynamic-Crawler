@@ -5,6 +5,9 @@ const sleep = (ms) => {
     return new Promise(resolve => setTimeout(resolve, ms))
 }
 
+const inScope = (url, scope) => {
+    return new RegExp(new URL(scope).hostname,'gi').test(new URL(url).hostname)
+}
 
 const urlParse = (url, page) => {
     try {
@@ -170,6 +173,7 @@ const hookJS = async () => {
 module.exports = {
     sleep,
     hookJS,
+    inScope,
     urlParse,
     checkRedirect
 };
